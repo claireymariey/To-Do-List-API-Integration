@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const API_URL = "http://localhost:8000/api/todos/";
 
 export default function TodoList() {
   const [tasks, setTasks] = useState([]);
@@ -7,41 +9,74 @@ export default function TodoList() {
   const [editingText, setEditingText] = useState("");
   const [filter, setFilter] = useState("All");
 
+  // Fetch tasks from API
+  useEffect(() => {
+    fetch(`${API_URL}fetch`)
+      .then((res) => res.json())
+      .then((data) => setTasks(data))
+      .catch((err) => console.error("Error fetching tasks:", err));
+  }, []);
+
   // Add a new task
   const addTask = () => {
     if (task.trim() === "") return;
-    setTasks([...tasks, { text: task, completed: false }]);
+    fetch(`${API_URL}create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: task, completed: false }),
+    })
+      .then((res) => res.json())
+      .then((newTask) => setTasks([...tasks, newTask]))
+      .catch((err) => console.error("Error adding task:", err));
     setTask("");
   };
 
   // Delete a task
-  const removeTask = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+  const removeTask = (id) => {
+    fetch(`${API_URL}${id}/delete`, { method: "DELETE" })
+      .then(() => setTasks(tasks.filter((task) => task.id !== id)))
+      .catch((err) => console.error("Error deleting task:", err));
   };
 
   // Start editing a task
   const startEditing = (index) => {
     setEditingIndex(index);
-    setEditingText(tasks[index].text);
+    setEditingText(tasks[index].title);
   };
 
   // Save edited task
   const saveEdit = () => {
     if (editingText.trim() === "") return;
-    const updatedTasks = [...tasks];
-    updatedTasks[editingIndex].text = editingText;
-    setTasks(updatedTasks);
-    setEditingIndex(null);
-    setEditingText("");
+    const taskToUpdate = tasks[editingIndex];
+
+    fetch(`${API_URL}${taskToUpdate.id}/update`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...taskToUpdate, title: editingText }),
+    })
+      .then((res) => res.json())
+      .then((updatedTask) => {
+        setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+        setEditingIndex(null);
+        setEditingText("");
+      })
+      .catch((err) => console.error("Error updating task:", err));
   };
 
   // Toggle task completion
-  const toggleComplete = (index) => {
-    setTasks(
-      tasks.map((t, i) =>
-        i === index ? { ...t, completed: !t.completed } : t
-      )
-    );
+  const toggleComplete = (id) => {
+    const taskToUpdate = tasks.find((t) => t.id === id);
+
+    fetch(`${API_URL}${id}/update`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...taskToUpdate, completed: !taskToUpdate.completed }),
+    })
+      .then((res) => res.json())
+      .then((updatedTask) => {
+        setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+      })
+      .catch((err) => console.error("Error toggling completion:", err));
   };
 
   // Filter tasks
@@ -76,11 +111,11 @@ export default function TodoList() {
       {/* Task List */}
       <ul className="task-list">
         {filteredTasks.map((t, index) => (
-          <li key={index} className={`task-item ${t.completed ? "completed" : ""}`}>
+          <li key={t.id} className={`task-item ${t.completed ? "completed" : ""}`}>
             <input
               type="checkbox"
               checked={t.completed}
-              onChange={() => toggleComplete(index)}
+              onChange={() => toggleComplete(t.id)}
             />
             {editingIndex === index ? (
               <div className="edit-container">
@@ -94,10 +129,10 @@ export default function TodoList() {
               </div>
             ) : (
               <>
-                <span className="task-text">{t.text}</span>
+                <span className="task-text">{t.title}</span>
                 <div className="buttons">
                   <button className="edit-btn" onClick={() => startEditing(index)}>✏️ Edit</button>
-                  <button className="delete-btn" onClick={() => removeTask(index)}>🗑️ Delete</button>
+                  <button className="delete-btn" onClick={() => removeTask(t.id)}>🗑️ Delete</button>
                 </div>
               </>
             )}
