@@ -8,11 +8,7 @@ SECRET_KEY = 'django-insecure-8w*iynjh$7#an!r3rmtmyf&$o2z6d8@zw54nweu4qy+9lzfuxh
 
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'to-do-list-api-integration.onrender.com',
-    '127.0.0.1',
-    'localhost'
-]
+ALLOWED_HOSTS = ['to-do-list-api-integration.onrender.com', '127.0.0.1', 'localhost']
 
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
@@ -24,6 +20,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://butong-to-do-list-api.netlify.app',
     'http://localhost:5173',
 ]
+
 
 CORS_ALLOW_ALL_ORIGINS = True  # Optional for development
 
