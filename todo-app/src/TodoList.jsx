@@ -15,8 +15,8 @@ export default function TodoList() {
     axios
       .get(API_URL)
       .then((response) => {
-        console.log(response.data);  // Log to inspect the structure of the response
-        setTasks(response.data);  // Assuming your API returns the task list with 'title' and 'completed' fields
+        console.log(response.data); // Log to inspect the structure of the response
+        setTasks(response.data); // Assuming your API returns the task list with 'title' and 'completed' fields
       })
       .catch((error) => {
         console.error("Error fetching tasks:", error);
@@ -26,11 +26,13 @@ export default function TodoList() {
   // Add a new task
   const addTask = () => {
     if (task.trim() === "") return;
+
     axios
-      .post(API_URL, { title: task, completed: false })  // Ensure to send 'title' for the new task
+      .post(API_URL, { title: task, completed: false }) // Ensure the request is sending the correct data
       .then((response) => {
-        setTasks([...tasks, response.data]);
-        setTask("");
+        console.log("Task added:", response.data); // Log to ensure the task is added
+        setTasks((prevTasks) => [...prevTasks, response.data]); // Add the new task to the state
+        setTask(""); // Clear the input field
       })
       .catch((error) => {
         console.error("Error adding task:", error);
@@ -41,9 +43,9 @@ export default function TodoList() {
   const removeTask = (index) => {
     const taskToRemove = tasks[index];
     axios
-      .delete(`${API_URL}${taskToRemove.id}/`)
+      .delete(`${API_URL}${taskToRemove.id}/`) // Delete the task by ID
       .then(() => {
-        setTasks(tasks.filter((_, i) => i !== index));
+        setTasks(tasks.filter((_, i) => i !== index)); // Remove the task from the state
       })
       .catch((error) => {
         console.error("Error deleting task:", error);
@@ -53,21 +55,23 @@ export default function TodoList() {
   // Start editing a task
   const startEditing = (index) => {
     setEditingIndex(index);
-    setEditingText(tasks[index].title);  // Use 'title' here instead of 'text'
+    setEditingText(tasks[index].title); // Use 'title' here instead of 'text'
   };
 
   // Save edited task
   const saveEdit = () => {
     if (editingText.trim() === "") return;
-    const updatedTask = { ...tasks[editingIndex], title: editingText };  // Update 'title'
+
+    const updatedTask = { ...tasks[editingIndex], title: editingText }; // Update 'title'
     axios
-      .put(`${API_URL}${updatedTask.id}/`, updatedTask)
+      .put(`${API_URL}${updatedTask.id}/`, updatedTask) // Send PUT request to update the task
       .then((response) => {
+        console.log("Task updated:", response.data); // Log to ensure the task is updated
         const updatedTasks = [...tasks];
-        updatedTasks[editingIndex] = response.data;
+        updatedTasks[editingIndex] = response.data; // Update the task in the state
         setTasks(updatedTasks);
-        setEditingIndex(null);
-        setEditingText("");
+        setEditingIndex(null); // Reset the editing state
+        setEditingText(""); // Clear the editing text
       })
       .catch((error) => {
         console.error("Error updating task:", error);
@@ -78,11 +82,9 @@ export default function TodoList() {
   const toggleComplete = (index) => {
     const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
     axios
-      .put(`${API_URL}${updatedTask.id}/`, updatedTask)
+      .put(`${API_URL}${updatedTask.id}/`, updatedTask) // Send PUT request to toggle the task completion
       .then((response) => {
-        const updatedTasks = tasks.map((t, i) =>
-          i === index ? response.data : t
-        );
+        const updatedTasks = tasks.map((t, i) => (i === index ? response.data : t)); // Update the task state
         setTasks(updatedTasks);
       })
       .catch((error) => {
@@ -107,7 +109,7 @@ export default function TodoList() {
           type="text"
           placeholder="Add a new task..."
           value={task}
-          onChange={(e) => setTask(e.target.value)}
+          onChange={(e) => setTask(e.target.value)} // Update task state
         />
         <button onClick={addTask}>➕ Add Task</button>
       </div>
@@ -126,21 +128,21 @@ export default function TodoList() {
             <input
               type="checkbox"
               checked={t.completed}
-              onChange={() => toggleComplete(index)}
+              onChange={() => toggleComplete(index)} // Toggle task completion
             />
             {editingIndex === index ? (
               <div className="edit-container">
                 <input
                   type="text"
                   value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)}
+                  onChange={(e) => setEditingText(e.target.value)} // Update editing text state
                 />
                 <button className="save-btn" onClick={saveEdit}>💾 Save</button>
                 <button className="cancel-btn" onClick={() => setEditingIndex(null)}>❌ Cancel</button>
               </div>
             ) : (
               <>
-                <span className="task-text">{t.title}</span>  {/* Ensure you display the task 'title' */}
+                <span className="task-text">{t.title}</span> {/* Display the task title */}
                 <div className="buttons">
                   <button className="edit-btn" onClick={() => startEditing(index)}>✏️ Edit</button>
                   <button className="delete-btn" onClick={() => removeTask(index)}>🗑️ Delete</button>
