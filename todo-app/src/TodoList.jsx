@@ -11,7 +11,6 @@ export default function TodoList() {
   const [editingText, setEditingText] = useState("");
   const [filter, setFilter] = useState("All");
 
-
   // Fetch tasks from the backend
   useEffect(() => {
     axios
