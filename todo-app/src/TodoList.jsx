@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+// Update the API URL to match Django backend paths
 const API_URL = "https://to-do-list-api-integration.onrender.com/api/todos/";
 
 export default function TodoList() {
@@ -13,7 +14,7 @@ export default function TodoList() {
   useEffect(() => {
     // Fetch tasks from the backend
     axios
-      .get(API_URL)
+      .get(`${API_URL}fetch`)  // Correct endpoint for fetching tasks
       .then((response) => {
         console.log(response.data);  // Log to inspect the structure of the response
         setTasks(response.data);  // Assuming your API returns the task list with 'title' and 'completed' fields
@@ -28,7 +29,7 @@ export default function TodoList() {
     if (task.trim() === "") return;
 
     axios
-      .post(API_URL, { title: task, completed: false })  // Ensure to send 'title' for the new task
+      .post(`${API_URL}create`, { title: task, completed: false })  // Correct endpoint for creating tasks
       .then((response) => {
         console.log("Task added:", response.data); // Log to ensure the task is added
         setTasks((prevTasks) => [...prevTasks, response.data]); // Add the new task to the state
@@ -43,7 +44,7 @@ export default function TodoList() {
   const removeTask = (index) => {
     const taskToRemove = tasks[index];
     axios
-      .delete(`${API_URL}${taskToRemove.id}/`)
+      .delete(`${API_URL}${taskToRemove.id}/delete`)  // Correct endpoint for deleting tasks
       .then(() => {
         setTasks(tasks.filter((_, i) => i !== index)); // Remove the task from the state
       })
@@ -63,7 +64,7 @@ export default function TodoList() {
     if (editingText.trim() === "") return;
     const updatedTask = { ...tasks[editingIndex], title: editingText };  // Update 'title'
     axios
-      .put(`${API_URL}${updatedTask.id}/`, updatedTask) // Send PUT request to update the task
+      .put(`${API_URL}${updatedTask.id}/update`, updatedTask) // Correct endpoint for updating task
       .then((response) => {
         console.log("Task updated:", response.data); // Log to ensure the task is updated
         const updatedTasks = [...tasks];
@@ -81,7 +82,7 @@ export default function TodoList() {
   const toggleComplete = (index) => {
     const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
     axios
-      .put(`${API_URL}${updatedTask.id}/`, updatedTask) // Send PUT request to toggle the task completion
+      .put(`${API_URL}${updatedTask.id}/update`, updatedTask) // Correct endpoint for toggling task completion
       .then((response) => {
         const updatedTasks = tasks.map((t, i) => (i === index ? response.data : t)); // Update the task state
         setTasks(updatedTasks);
