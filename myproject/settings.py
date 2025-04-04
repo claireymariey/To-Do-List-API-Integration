@@ -28,6 +28,7 @@ SECRET_KEY = 'django-insecure-8w*iynjh$7#an!r3rmtmyf&$o2z6d8@zw54nweu4qy+9lzfuxh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['to-do-list-api-integration.onrender.com', '127.0.0.1', 'localhost']
 
 REST_FRAMEWORK = {
@@ -41,7 +42,13 @@ CORS_ALLOWED_ORIGINS = [
     'https://butong-to-do-list-api.netlify.app',
     'http://localhost:5173',
 ]
+=======
+ALLOWED_HOSTS = ['to-do-list-api-integration.onrender.com']
+>>>>>>> cceb718634eb368effcb8c3f81da1fd1b5b7814d
 
+CORS_ALLOWED_ORIGINS = [
+    'https://butong-to-do-list-api.netlify.app',
+]
 
 # Application definition
 
@@ -52,6 +59,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+=======
+
+>>>>>>> cceb718634eb368effcb8c3f81da1fd1b5b7814d
     'myapp',
     'corsheaders',
     'rest_framework',
@@ -59,7 +70,11 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+<<<<<<< HEAD
     "whitenoise.middleware.WhiteNoiseMiddleware",
+=======
+    "whitenoise.middleware.WhiteNoiseMiddleware",  
+>>>>>>> cceb718634eb368effcb8c3f81da1fd1b5b7814d
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Ensure this is here
     'django.middleware.common.CommonMiddleware',
@@ -142,8 +157,12 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+<<<<<<< HEAD
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True  # This will allow all origins for testing
     
+=======
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+>>>>>>> cceb718634eb368effcb8c3f81da1fd1b5b7814d
