@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-// Update the API URL to match Django backend paths
+// Corrected API URL with trailing slashes
 const API_URL = "https://to-do-list-api-integration.onrender.com/api/todos/";
 
 export default function TodoList() {
@@ -11,85 +11,70 @@ export default function TodoList() {
   const [editingText, setEditingText] = useState("");
   const [filter, setFilter] = useState("All");
 
+  // Fetch tasks from the backend
   useEffect(() => {
-    // Fetch tasks from the backend
     axios
-      .get(`${API_URL}fetch`)  // Correct endpoint for fetching tasks
+      .get(`${API_URL}fetch/`)  // Ensure correct endpoint
       .then((response) => {
-        console.log(response.data);  // Log to inspect the structure of the response
-        setTasks(response.data);  // Assuming your API returns the task list with 'title' and 'completed' fields
+        console.log("Fetched tasks:", response.data);
+        setTasks(response.data); 
       })
-      .catch((error) => {
-        console.error("Error fetching tasks:", error);
-      });
+      .catch((error) => console.error("Error fetching tasks:", error));
   }, []);
 
   // Add a new task
   const addTask = () => {
     if (task.trim() === "") return;
-
     axios
-      .post(`${API_URL}create`, { title: task, completed: false })  // Correct endpoint for creating tasks
+      .post(`${API_URL}create/`, { title: task, completed: false }) 
       .then((response) => {
-        console.log("Task added:", response.data); // Log to ensure the task is added
-        setTasks((prevTasks) => [...prevTasks, response.data]); // Add the new task to the state
-        setTask(""); // Clear the input field
+        console.log("Task added:", response.data);
+        setTasks((prevTasks) => [...prevTasks, response.data]);
+        setTask("");
       })
-      .catch((error) => {
-        console.error("Error adding task:", error);
-      });
+      .catch((error) => console.error("Error adding task:", error));
   };
 
   // Delete a task
   const removeTask = (index) => {
     const taskToRemove = tasks[index];
     axios
-      .delete(`${API_URL}${taskToRemove.id}/delete`)  // Correct endpoint for deleting tasks
-      .then(() => {
-        setTasks(tasks.filter((_, i) => i !== index)); // Remove the task from the state
-      })
-      .catch((error) => {
-        console.error("Error deleting task:", error);
-      });
+      .delete(`${API_URL}${taskToRemove.id}/delete/`)
+      .then(() => setTasks(tasks.filter((_, i) => i !== index)))
+      .catch((error) => console.error("Error deleting task:", error));
   };
 
   // Start editing a task
   const startEditing = (index) => {
     setEditingIndex(index);
-    setEditingText(tasks[index].title);  // Use 'title' here instead of 'text'
+    setEditingText(tasks[index].title);
   };
 
   // Save edited task
   const saveEdit = () => {
     if (editingText.trim() === "") return;
-    const updatedTask = { ...tasks[editingIndex], title: editingText };  // Update 'title'
+    const updatedTask = { ...tasks[editingIndex], title: editingText };
     axios
-      .put(`${API_URL}${updatedTask.id}/update`, updatedTask) // Correct endpoint for updating task
+      .put(`${API_URL}${updatedTask.id}/update/`, updatedTask)
       .then((response) => {
-        console.log("Task updated:", response.data); // Log to ensure the task is updated
         const updatedTasks = [...tasks];
-        updatedTasks[editingIndex] = response.data; // Update the task in the state
+        updatedTasks[editingIndex] = response.data;
         setTasks(updatedTasks);
-        setEditingIndex(null); // Reset the editing state
-        setEditingText(""); // Clear the editing text
+        setEditingIndex(null);
+        setEditingText("");
       })
-      .catch((error) => {
-        console.error("Error updating task:", error);
-      });
+      .catch((error) => console.error("Error updating task:", error));
   };
 
   // Toggle task completion
   const toggleComplete = (index) => {
     const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
     axios
-      .put(`${API_URL}${updatedTask.id}/update`, updatedTask) // Correct endpoint for toggling task completion
+      .put(`${API_URL}${updatedTask.id}/update/`, updatedTask)
       .then((response) => {
-        const updatedTasks = tasks.map((t, i) => (i === index ? response.data : t)); // Update the task state
-        setTasks(updatedTasks);
+        setTasks(tasks.map((t, i) => (i === index ? response.data : t)));
       })
-      .catch((error) => {
-        console.error("Error toggling task completion:", error);
-      });
+      .catch((error) => console.error("Error toggling task completion:", error));
   };
 
   // Filter tasks
@@ -109,7 +94,7 @@ export default function TodoList() {
           type="text"
           placeholder="Add a new task..."
           value={task}
-          onChange={(e) => setTask(e.target.value)} // Update task state
+          onChange={(e) => setTask(e.target.value)}
         />
         <button onClick={addTask}>➕ Add Task</button>
       </div>
@@ -124,25 +109,25 @@ export default function TodoList() {
       {/* Task List */}
       <ul className="task-list">
         {filteredTasks.map((t, index) => (
-          <li key={index} className={`task-item ${t.completed ? "completed" : ""}`}>
+          <li key={t.id} className={`task-item ${t.completed ? "completed" : ""}`}>
             <input
               type="checkbox"
               checked={t.completed}
-              onChange={() => toggleComplete(index)} // Toggle task completion
+              onChange={() => toggleComplete(index)}
             />
             {editingIndex === index ? (
               <div className="edit-container">
                 <input
                   type="text"
                   value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)} // Update editing text state
+                  onChange={(e) => setEditingText(e.target.value)}
                 />
                 <button className="save-btn" onClick={saveEdit}>💾 Save</button>
                 <button className="cancel-btn" onClick={() => setEditingIndex(null)}>❌ Cancel</button>
               </div>
             ) : (
               <>
-                <span className="task-text">{t.title}</span>  {/* Ensure you display the task 'title' */}
+                <span className="task-text">{t.title}</span>
                 <div className="buttons">
                   <button className="edit-btn" onClick={() => startEditing(index)}>✏️ Edit</button>
                   <button className="delete-btn" onClick={() => removeTask(index)}>🗑️ Delete</button>
