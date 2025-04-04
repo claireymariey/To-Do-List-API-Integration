@@ -15,7 +15,8 @@ export default function TodoList() {
     axios
       .get(API_URL)
       .then((response) => {
-        setTasks(response.data);  // Assuming your API returns the task list
+        console.log(response.data);  // Log to inspect the structure of the response
+        setTasks(response.data);  // Assuming your API returns the task list with 'title' and 'completed' fields
       })
       .catch((error) => {
         console.error("Error fetching tasks:", error);
@@ -26,7 +27,7 @@ export default function TodoList() {
   const addTask = () => {
     if (task.trim() === "") return;
     axios
-      .post(API_URL, { text: task, completed: false })
+      .post(API_URL, { title: task, completed: false })  // Ensure to send 'title' for the new task
       .then((response) => {
         setTasks([...tasks, response.data]);
         setTask("");
@@ -40,7 +41,7 @@ export default function TodoList() {
   const removeTask = (index) => {
     const taskToRemove = tasks[index];
     axios
-      .delete(`${API_URL}${taskToRemove.id}`)
+      .delete(`${API_URL}${taskToRemove.id}/`)
       .then(() => {
         setTasks(tasks.filter((_, i) => i !== index));
       })
@@ -52,13 +53,13 @@ export default function TodoList() {
   // Start editing a task
   const startEditing = (index) => {
     setEditingIndex(index);
-    setEditingText(tasks[index].text);
+    setEditingText(tasks[index].title);  // Use 'title' here instead of 'text'
   };
 
   // Save edited task
   const saveEdit = () => {
     if (editingText.trim() === "") return;
-    const updatedTask = { ...tasks[editingIndex], text: editingText };
+    const updatedTask = { ...tasks[editingIndex], title: editingText };  // Update 'title'
     axios
       .put(`${API_URL}${updatedTask.id}/`, updatedTask)
       .then((response) => {
@@ -139,7 +140,7 @@ export default function TodoList() {
               </div>
             ) : (
               <>
-                <span className="task-text">{t.text}</span>
+                <span className="task-text">{t.title}</span>  {/* Ensure you display the task 'title' */}
                 <div className="buttons">
                   <button className="edit-btn" onClick={() => startEditing(index)}>✏️ Edit</button>
                   <button className="delete-btn" onClick={() => removeTask(index)}>🗑️ Delete</button>
