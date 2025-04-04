@@ -31,7 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['to-do-list-api-integration.onrender.com']
 
 CORS_ALLOWED_ORIGINS = [
-    'https://butong-to-do-list-api.netlify.app/',
+    'https://butong-to-do-list-api.netlify.app',
 ]
 
 # Application definition
