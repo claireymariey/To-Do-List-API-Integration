@@ -1,6 +1,6 @@
 # To-Do-List-API-Integration LINKS
 
-4 API ENDPOINTS LINK:
+4 API ENDPOINTS LINKS:
 
 https://to-do-list-api-integration.onrender.com/api/todos/fetch/
 
