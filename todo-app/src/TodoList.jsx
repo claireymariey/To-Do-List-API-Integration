@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+const API_URL = "https://to-do-list-api-integration.onrender.com/api/todos/";
 
 export default function TodoList() {
   const [tasks, setTasks] = useState([]);
@@ -7,16 +10,43 @@ export default function TodoList() {
   const [editingText, setEditingText] = useState("");
   const [filter, setFilter] = useState("All");
 
+  useEffect(() => {
+    // Fetch tasks from the backend
+    axios
+      .get(API_URL)
+      .then((response) => {
+        setTasks(response.data);  // Assuming your API returns the task list
+      })
+      .catch((error) => {
+        console.error("Error fetching tasks:", error);
+      });
+  }, []);
+
   // Add a new task
   const addTask = () => {
     if (task.trim() === "") return;
-    setTasks([...tasks, { text: task, completed: false }]);
-    setTask("");
+    axios
+      .post(API_URL, { text: task, completed: false })
+      .then((response) => {
+        setTasks([...tasks, response.data]);
+        setTask("");
+      })
+      .catch((error) => {
+        console.error("Error adding task:", error);
+      });
   };
 
   // Delete a task
   const removeTask = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+    const taskToRemove = tasks[index];
+    axios
+      .delete(`${API_URL}${taskToRemove.id}`)
+      .then(() => {
+        setTasks(tasks.filter((_, i) => i !== index));
+      })
+      .catch((error) => {
+        console.error("Error deleting task:", error);
+      });
   };
 
   // Start editing a task
@@ -28,20 +58,35 @@ export default function TodoList() {
   // Save edited task
   const saveEdit = () => {
     if (editingText.trim() === "") return;
-    const updatedTasks = [...tasks];
-    updatedTasks[editingIndex].text = editingText;
-    setTasks(updatedTasks);
-    setEditingIndex(null);
-    setEditingText("");
+    const updatedTask = { ...tasks[editingIndex], text: editingText };
+    axios
+      .put(`${API_URL}${updatedTask.id}/`, updatedTask)
+      .then((response) => {
+        const updatedTasks = [...tasks];
+        updatedTasks[editingIndex] = response.data;
+        setTasks(updatedTasks);
+        setEditingIndex(null);
+        setEditingText("");
+      })
+      .catch((error) => {
+        console.error("Error updating task:", error);
+      });
   };
 
   // Toggle task completion
   const toggleComplete = (index) => {
-    setTasks(
-      tasks.map((t, i) =>
-        i === index ? { ...t, completed: !t.completed } : t
-      )
-    );
+    const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
+    axios
+      .put(`${API_URL}${updatedTask.id}/`, updatedTask)
+      .then((response) => {
+        const updatedTasks = tasks.map((t, i) =>
+          i === index ? response.data : t
+        );
+        setTasks(updatedTasks);
+      })
+      .catch((error) => {
+        console.error("Error toggling task completion:", error);
+      });
   };
 
   // Filter tasks
