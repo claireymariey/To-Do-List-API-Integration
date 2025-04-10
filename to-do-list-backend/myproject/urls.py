@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 from myapp.views import MyProtectedView
-from .views import SecureHelloView
+from myapp.views import SecureHelloView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
