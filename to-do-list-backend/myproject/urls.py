@@ -16,9 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.authtoken.views import obtain_auth_token
+from myapp.views import MyProtectedView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/todos/', include('myapp.urls')), 
+    path('api/protected/', MyProtectedView.as_view(), name='preotected-view'),
+    path('api/token/', obtain_auth_token, name='token-obtain'),
 ]
  
