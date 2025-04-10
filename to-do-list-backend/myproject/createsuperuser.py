@@ -1,23 +1,29 @@
-# create_superuser.py
+# users/management/commands/createsuperuser.py
 
-import os
-import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
-django.setup()
-
+from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
 
-# Custom user details
-username = 'admin'
-email = 'admin@email.com'
-password = 'admin123'
+class Command(BaseCommand):
+    help = 'Creates a superuser with a token and predefined credentials'
 
-User = get_user_model()
+    def handle(self, *args, **kwargs):
+        # Predefined credentials
+        username = 'admin'
+        email = 'admin@email.com'
+        password = 'admin123'
 
-# Check if the user already exists
-if not User.objects.filter(username=username).exists():
-    user = User.objects.create_superuser(username=username, email=email, password=password)
-    print(f"Superuser {user.username} created!")
-else:
-    print(f"Superuser with username {username} already exists.")
+        # Create superuser
+        User = get_user_model()
+        
+        # Check if the user already exists to avoid duplication
+        if not User.objects.filter(username=username).exists():
+            user = User.objects.create_superuser(username=username, email=email, password=password)
+
+            # Automatically create and assign a token
+            token, created = Token.objects.get_or_create(user=user)
+
+            self.stdout.write(self.style.SUCCESS(f'Superuser {username} created successfully!'))
+            self.stdout.write(self.style.SUCCESS(f'Token: {token.key}'))
+        else:
+            self.stdout.write(self.style.WARNING(f'User with username {username} already exists.'))
