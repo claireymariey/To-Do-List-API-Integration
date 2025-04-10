@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 from myapp.views import MyProtectedView
+from myapp.views import SecureHelloView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,6 +26,7 @@ urlpatterns = [
     path('api/protected/', MyProtectedView.as_view(), name='preotected-view'),
     path('api/token/', obtain_auth_token, name='token-obtain'),
     path('api-token-auth/', obtain_auth_token),
+    path('secure-hello/', SecureHelloView.as_view()),
 
 ]
  
