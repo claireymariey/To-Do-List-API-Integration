@@ -10,8 +10,8 @@ from django.contrib.auth import get_user_model
 
 # Custom user details
 username = 'admin'
-email = 'admin@example.com'
-password = 'adminpassword123'
+email = 'admin@email.com'
+password = 'admin123'
 
 User = get_user_model()
 
